@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.7/dayjs.min.js" integrity="sha512-kZ+x2gdehn6OZMWZSp3Vt5R+v9hQTYEATQwaUfWquhxbvNVAy6IRtYs7asdyxKUTqG0I5ZqBqnzcBrpnHJCAGw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js" integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ==" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" integrity="sha512-f73UKwzP1Oia45eqHpHwzJtFLpvULbhVpEJfaWczo/ZCV5NWSnK4vLDnjTaMps28ocZ05RbI83k2RlQH92zy7A==" crossorigin="anonymous" />
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+    <div id="app">
+
+        <header>
+           <div class="nav_bar_container">
+                <img src="img/Boolflix-logo.png" alt="">
+        
+                <ul class="nav_bar_list">
+                    <li v-for='(headerLink, index) in headerLinks'>
+                        <a href="">{{headerLink}}</a>
+                    </li>
+                </ul>
+           </div>
+
+           <img class="brand_name" src="img/BOOLFLIX.png" alt="">
+    
+            <div class="search_container">
+                <div class="input_field">
+                    <input @keydown.enter="filterFilms" type="text" value="Search" v-model="search">
+                </div>
+    
+                <select class="genres_select" name="" id="genreSelection" v-if="showsList.length > 0" v-model="select" @change="filterByGenre">
+                    <option value="">Filtra per genere</option>
+                    <option v-for="genre in genres" :value="genre">{{genre.name}}</option>
+                </select>
+    
+            </div>
+        </header>
+    
+        <main>
+            <div class="jumbotron">
+                <div class="slogan">
+                    <h1>V PER VENDETTA</h1>
+                    <h3>Oggi al n°6 in Italia</h3>
+                    
+                    <div class="jumbotron_btns">
+                        <a href="" class="btn btn_white">
+                            <span>Riproduci</span>
+                        </a>
+                        <a href="" class="btn btn_gray"><span>Altre info</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards">
+                <div v-for="film in filteredShowList" class="card">
+                    <img class="cover_img" :src="imgFunction(film.poster_path)" alt="">
+                    <div class="info_hover_box">
+                        <div class="info_hover_img_container">
+                            <img class="half_cover_img" :src="imgFunction(film.poster_path)" alt="">
+                        </div>
+                        <div class="content_hover_box">
+                            <img class="flag" :src="generateFlags(film.original_language)" alt="">
+                            <p>Titolo: <span>{{film.title || film.name}}</span> </p>
+                            <p>Attori: <span v-for="actor in film.cast"></span> </p>
+                        <!-- <p >Genere: <span v-for="(genre,index) in genres" v-if="filterGenres(genre.id,film.genre_ids)">{{genre.name}},</span></p> -->
+                            <p>Voto: <i v-for="(icon, index) in 5" :class="voteFunction(film.vote_average, index)"></i>
+            
+                            </p>
+                        
+                            <p>{{film.overview}}</p>
+                        
+                        </div>
+        
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+
+    <script src="js/main.js" charset="utf-8"></script>
+</body>
+</html>
