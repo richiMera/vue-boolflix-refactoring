@@ -2,13 +2,11 @@ var app = new Vue({
 
     el: '#app',
     data: {
-        headerLinks: ['Home', 'Serie TV', 'Film'],
+        scrollPosition: null,
         search: '',
         genres: [],
         films: [],
         tvSeries: [],
-        filmsGenres: [],
-        seriesGenres: [],
         filteredShowList: [],
         showsList: [],
         path: 'https://image.tmdb.org/t/p/w342/',
@@ -53,9 +51,14 @@ var app = new Vue({
           });
           this.genres = moviesGenresArray.concat(seriesGenresArray);
       });
+
+      window.addEventListener('scroll', this.updateScroll);
   },
     methods: {
-       getCastName(achtors){
+        updateScroll() {
+            this.scrollPosition = window.scrollY
+        },
+        getCastName(achtors){
             const cast = [];
 
             achtors.forEach(element => {
@@ -92,119 +95,166 @@ var app = new Vue({
                 this.tvSeries = newArray;
             } else this.films = newArray;
         },
-      filterFilms(){
-        if (this.search != '') {
-            this.reset();
-            Promise.all([
+        filterFilms(){
+            if (this.search != '') {
+                this.reset();
+                Promise.all([
                 //chiamata API movie
-                axios.get('https://api.themoviedb.org/3/search/movie',
-                {
-                    params: {
-                        api_key: this.myApiKey,
-                        query: this.search,
-                        language: 'it-IT'
-                    }
-                }),
-                //chiamata API serie
-                axios.get('https://api.themoviedb.org/3/search/tv',
-                {
-                    params: {
-                        api_key: this.myApiKey,
-                        query: this.search,
-                        language: 'it-IT'
-                    }
-                })
-            ])
-            .then((response) => {
-                //salvo i risultati nell'array movies
-                this.films = response[0].data.results;
-                this.tvSeries = response[1].data.results;
+                    axios.get('https://api.themoviedb.org/3/search/movie',
+                    {
+                        params: {
+                            api_key: this.myApiKey,
+                            query: this.search,
+                            language: 'it-IT'
+                        }
+                    }),
+                    //chiamata API serie
+                    axios.get('https://api.themoviedb.org/3/search/tv',
+                    {
+                        params: {
+                            api_key: this.myApiKey,
+                            query: this.search,
+                            language: 'it-IT'
+                        }
+                    })
+                ])
+                .then((response) => {
+                    //salvo i risultati nell'array movies
+                    this.films = response[0].data.results;
+                    this.tvSeries = response[1].data.results;
 
-                //cast di film e serie
-                this.printCast('movie', this.films);                    
-                this.printCast('tv', this.tvSeries);
+                    //cast di film e serie
+                    this.printCast('movie', this.films);                    
+                    this.printCast('tv', this.tvSeries);
 
-                this.filteredShowList = this.showsList;
+                    this.filteredShowList = this.showsList;
 
-                this.search = '';
+                    this.search = '';
+                    
                 });
-        }
-    },
-        // filterFilms: function() {
-        //   const self = this;
-        //   const query = this.search;
-  
-        //   if (query != "") {
-        //     axios
-        //     .get("https://api.themoviedb.org/3/search/movie", {
-        //       params: {
-        //         api_key: self.myApiKey,
-        //         query,
-        //         language: "it-IT"
-        //       }
-        //     }).then((response) => {
-        //       self.films = response.data.results;
-
-        //       for (let i = 0; i < self.films.length; i++) {
-        //         self.films[i].fiveActhors = [];
-      
-        //         let idParams = self.films[i].id
-        //         let url = "https://api.themoviedb.org/3/movie/" + idParams + " /credits?api_key=2dbf921bb98f37f2f23b462ffd4a6e66&language=it-IT"
-      
-        //         axios
-        //           .get(url)
-        //           .then( function(element) {
-      
-        //             for(let j = 0; j < element.data.cast.length; j++) {
-        //               if(self.films[i].fiveActhors.length < 5) {
-        //                   self.films[i].fiveActhors.push(element.data.cast[j].name);
-        //               }
-        //             }
-        //             self.$forceUpdate();
-      
-        //         });
-      
-        //       }; //CICLE FROM ID-CAST-API-CALL
-  
-        //     });
-        //   }
-        // },
+            }
+        },
         imgFunction: function(image) { // GENERATE POSTER_PATH OR DEFAULT IMAGE
             if(image ) {
-              return this.path + image;
+                return this.path + image;
             } else {
-              return this.defaultImg;
+                return this.defaultImg;
             }
-          },
-          generateFlags: function(language) { // PRINT FLAGS FUNCTION
+        },
+        generateFlags: function(language) { // PRINT FLAGS FUNCTION
             if(language == 'it') {
-              return "img/it-flag.png";
+                return "img/it-flag.png";
             } else if (language == 'es') {
-              return "img/esp-flag.png";
+                return "img/esp-flag.png";
             } else if (language == 'en') {
-              return "img/uk-flag.png";
+                return "img/uk-flag.png";
             } else {
-              return 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Flag_of_Esperanto_new.svg';
+                return 'https://upload.wikimedia.org/wikipedia/commons/8/8e/Flag_of_Esperanto_new.svg';
             }
-          },
+        },
           voteFunction: function(voto, index) { // FUNCTION TO CALCOLATE STARS AVARAGE
       
             if(Math.ceil(voto) / 2 > index) {
-              return this.fullStar;
+                return this.fullStar;
             } else {
-              return this.emptyStar;
+                return this.emptyStar;
             }
       
           },
-           filterByGenre(){
-             if (this.select == ''){
-                 this.filteredShowList = this.showsList;
-             } else {
-                 this.filteredShowList = this.showsList.filter((element) => {
-                     return element.genre_ids.includes(this.select.id);
-                 });
-             }
-         },
+          getGenre(arrOfGenre) {         
+            const genres = [];   
+            this.genres.forEach(element => {
+                if (arrOfGenre.includes(element.id)) {
+                    genres.push(element.name);
+                }
+            });
+            return genres;
+        },
+        filterByGenre(){
+            if (this.select == ''){
+                this.filteredShowList = this.showsList;
+            } else {
+                this.filteredShowList = this.showsList.filter((element) => {
+                    return element.genre_ids.includes(this.select.id);
+                });
+            }
+        },
+           //stampo film popolari
+        popularFilms()  {
+            this.select = '';
+            if(this.films.length == 0){
+                this.reset();
+                axios.get('https://api.themoviedb.org/3/movie/popular',
+                        {
+                            params: {
+                                api_key: this.myApiKey,
+                                language: 'it-IT'
+                            }
+                        })
+                        .then(response => {
+                            this.filteredShowList = response.data.results;
+                            this.printCast('movie', this.filteredShowList);
+                            this.filteredShowList = this.showsList;
+                        });
+            } else {
+                this.filteredShowList = this.films;
+            }
+        },
+        //stampo serie tv popolari
+        popularSeries() {     
+            this.select = '';    
+            if(this.tvSeries.length == 0){
+                this.reset();
+                axios.get('https://api.themoviedb.org/3/tv/popular',
+                {
+                    params: {
+                        api_key: this.myApiKey,
+                        language: 'it-IT'
+                    }
+                })
+                .then(response => {
+                    this.filteredShowList = response.data.results;
+                    this.printCast('tv', this.filteredShowList);
+                    this.filteredShowList = this.showsList;
+                });
+            }   else {
+                    this.filteredShowList = this.tvSeries;
+                }
+        },
+        //stampo tutti gli show popolari
+        popularFromAll(){
+            this.reset();
+                Promise.all([
+                    //chiamata API movie
+                    axios.get('https://api.themoviedb.org/3/movie/popular',
+                    {
+                        params: {
+                            api_key: this.myApiKey,
+                            language: 'it-IT'
+                        }
+                    }),
+                    //chiamata API serie
+                    axios.get('https://api.themoviedb.org/3/tv/popular',
+                    {
+                        params: {
+                            api_key: this.myApiKey,
+                            language: 'it-IT'
+                        }
+                    })
+                ])
+                .then((response) => {
+                    //salvo i risultati nell'array movies
+                    const popFilms = response[0].data.results;
+                    const popSeries = response[1].data.results;
+
+                    //cast
+                    this.printCast('movie', popFilms);
+                    this.printCast('tv', popSeries);
+
+                    this.filteredShowList = this.showsList;
+                });
+                console.log(this.filteredShowList);
+        },
          reset() {
           this.showsList = [];
           this.filteredShowList = [];

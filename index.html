@@ -10,6 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js" integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ==" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,700;1,300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.css" integrity="sha512-f73UKwzP1Oia45eqHpHwzJtFLpvULbhVpEJfaWczo/ZCV5NWSnK4vLDnjTaMps28ocZ05RbI83k2RlQH92zy7A==" crossorigin="anonymous" />
     <title></title>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -17,13 +19,22 @@
 <body>
     <div id="app">
 
-        <header>
+        <header :class="{change_color: scrollPosition > 50}">
            <div class="nav_bar_container">
-                <img src="img/Boolflix-logo.png" alt="">
+               <a @click="reset" href="#"> <img src="img/Boolflix-logo.png" alt=""></a>
         
                 <ul class="nav_bar_list">
-                    <li v-for='(headerLink, index) in headerLinks'>
-                        <a href="">{{headerLink}}</a>
+                    <li>
+                        <a @click="reset" href="#">Home</a>
+                    </li>
+                    <li>
+                        <a @click="popularFilms" href="#">Films</a>
+                    </li>
+                    <li>
+                        <a @click="popularSeries" href="#">Tv Series</a>
+                    </li>
+                    <li>
+                        <a @click="popularFromAll" href="#">Most Popular</a>
                     </li>
                 </ul>
            </div>
@@ -35,8 +46,8 @@
                     <input @keydown.enter="filterFilms" type="text" value="Search" v-model="search">
                 </div>
     
-                <select class="genres_select" name="" id="genreSelection" v-if="showsList.length > 0" v-model="select" @change="filterByGenre">
-                    <option value="">Filtra per genere</option>
+                <select class="genres_select" name="" id="selectGenres" v-if="showsList.length > 0" v-model="select" @change="filterByGenre">
+                    <option value="">Genres</option>
                     <option v-for="genre in genres" :value="genre">{{genre.name}}</option>
                 </select>
     
@@ -46,8 +57,8 @@
         <main>
             <div class="jumbotron">
                 <div class="slogan">
-                    <h1>V PER VENDETTA</h1>
-                    <h3>Oggi al n°6 in Italia</h3>
+                    <h1><span>V</span> PER VENDETTA</h1>
+                    <h3>Oggi al n°<span>6</span> in Italia</h3>
                     
                     <div class="jumbotron_btns">
                         <a href="" class="btn btn_white">
@@ -58,24 +69,22 @@
                 </div>
             </div>
 
-            <div class="cards">
+            <div class="cards" v-if="showsList.length > 0">
                 <div v-for="film in filteredShowList" class="card">
                     <img class="cover_img" :src="imgFunction(film.poster_path)" alt="">
                     <div class="info_hover_box">
                         <div class="info_hover_img_container">
-                            <img class="half_cover_img" :src="imgFunction(film.poster_path)" alt="">
+                            <img class="scale_cover_img" :src="imgFunction(film.poster_path)" alt="">
                         </div>
                         <div class="content_hover_box">
-                            <img class="flag" :src="generateFlags(film.original_language)" alt="">
-                            <p>Titolo: <span>{{film.title || film.name}}</span> </p>
-                            <p>Attori: <span v-for="actor in film.cast"></span> </p>
-                        <!-- <p >Genere: <span v-for="(genre,index) in genres" v-if="filterGenres(genre.id,film.genre_ids)">{{genre.name}},</span></p> -->
-                            <p>Voto: <i v-for="(icon, index) in 5" :class="voteFunction(film.vote_average, index)"></i>
-            
-                            </p>
-                        
-                            <p>{{film.overview}}</p>
-                        
+                            <div class="flag_box">
+                                <img class="flag" :src="generateFlags(film.original_language)" alt="">
+                            </div>
+                            <p>Title: <span>{{film.title || film.name}}</span> </p>
+                            <p class="achtor">Cast: <span v-for="actor in film.cast">{{actor}}<span class="comma">, </span></span></p>
+                            <p>Genres: <span v-for="genre in getGenre(film.genre_ids)">{{genre}}<span class="comma">, </span></span></p>
+                            <p>Rate:<i v-for="(icon, index) in 5" :class="voteFunction(film.vote_average, index)"></i></p>
+                            <p>Overview: <span>{{film.overview}}</span></p>
                         </div>
         
                     </div>
@@ -83,9 +92,24 @@
             </div>
         </main>
 
+        <footer>
+            <div class="wrapper">
+                <div class="socialLinks_container">
+                    <a href="https://www.linkedin.com/in/riccardo-ferrari-5a5a1117a/"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/richiMera"><i class="fab fa-github"></i></a>
+                </div>
+
+                <div class="copyright">
+                    <small><i class="far fa-copyright"></i> Riccardo Ferrari web developer</small>
+                </div>
+            </div>
+        </footer>
+
     </div>
 
 
     <script src="js/main.js" charset="utf-8"></script>
 </body>
 </html>
+                        
+                        
