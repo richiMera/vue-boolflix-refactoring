@@ -39,18 +39,24 @@
                 </ul>
            </div>
 
-           <img class="brand_name" src="img/BOOLFLIX.png" alt="">
+           <div class="brand_img_container">
+                <img class="brand_name" src="img/BOOLFLIX.png" alt="">
+           </div>
     
             <div class="search_container">
+
                 <div class="input_field">
-                    <input @keydown.enter="filterFilms" type="text" value="Search" v-model="search">
-                </div>
+                    <input @keydown.enter="filterFilms" type="search" pattern=".*\S.*" value="Search" v-model="search" required>
+                    <button @click="filterFilms" class="search_btn" type="submit">
+                        <span>Search</span>
+                    </button>
+                </div> 
     
-                <select class="genres_select" name="" id="selectGenres" v-if="showsList.length > 0" v-model="select" @change="filterByGenre">
+                <select class="genres_select" name="" id="selectGenres" v-model="select" @change="filterByGenre">
                     <option value="">Genres</option>
                     <option v-for="genre in genres" :value="genre">{{genre.name}}</option>
                 </select>
-    
+                
             </div>
         </header>
     
@@ -113,3 +119,4 @@
 </html>
                         
                         
+                
